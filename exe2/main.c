@@ -15,6 +15,17 @@ const int LED_PIN_G = 6;
 SemaphoreHandle_t xSemaphore_r;
 SemaphoreHandle_t xSemaphore_g;
 
+SemaphoreHandle_t xSemaphore_btn_r;
+SemaphoreHandle_t xSemaphore_btn_g;
+
+void btn_callback(uint gpio, uint32_t events) {
+  if (gpio == BTN_PIN_R){
+    xSemaphoreGiveFromISR(xSemaphore_btn_r, 0);
+  } else if (gpio == BTN_PIN_G){
+    xSemaphoreGiveFromISR(xSemaphore_btn_g, 0);
+  }
+}
+
 void led_1_task(void *p) {
   gpio_init(LED_PIN_R);
   gpio_set_dir(LED_PIN_R, GPIO_OUT);
@@ -38,10 +49,8 @@ void btn_1_task(void *p) {
   gpio_pull_up(BTN_PIN_R);
 
   while (true) {
-    if (!gpio_get(BTN_PIN_R)) {
-      while (!gpio_get(BTN_PIN_R)) {
-        vTaskDelay(pdMS_TO_TICKS(1));
-      }
+    if (xSemaphoreTake(xSemaphore_btn_r, pdMS_TO_TICKS(100) == pdTRUE)) {
+      vTaskDelay(pdMS_TO_TICKS(1));
       xSemaphoreGive(xSemaphore_r);
     }
   }
@@ -70,13 +79,11 @@ void btn_2_task(void *p) {
   gpio_pull_up(BTN_PIN_G);
 
   while (true) {
-    if (!gpio_get(BTN_PIN_G)) {
-      while (!gpio_get(BTN_PIN_G)) {
-        vTaskDelay(pdMS_TO_TICKS(1));
-      }
+    if (xSemaphoreTake(xSemaphore_btn_g, pdMS_TO_TICKS(100) == pdTRUE)) {
+      vTaskDelay(pdMS_TO_TICKS(1));
       xSemaphoreGive(xSemaphore_g);
     }
-  }
+  } 
 }
 
 int main() {
