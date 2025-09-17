@@ -15,6 +15,9 @@ const int LED_PIN_G = 6;
 QueueHandle_t xQueueButId;
 QueueHandle_t xQueueButId_g;
 
+QueueHandle_t xQueueButId;
+QueueHandle_t xQueueButId_g;
+
 void led_1_task(void *p) {
     gpio_init(LED_PIN_R);
     gpio_set_dir(LED_PIN_R, GPIO_OUT);
@@ -41,20 +44,16 @@ void btn_1_task(void *p) {
 
     int delay = 0;
     while (true) {
-        if (!gpio_get(BTN_PIN_R)) {
+        vTaskDelay(pdMS_TO_TICKS(1));
 
-            while (!gpio_get(BTN_PIN_R)) {
-                vTaskDelay(pdMS_TO_TICKS(1));
-            }
-
-            if (delay < 1000) {
-                delay += 100;
-            } else {
-                delay = 100;
-            }
-            printf("delay btn %d \n", delay);
-            xQueueSend(xQueueButId, &delay, 0);
+        if (delay < 1000) {
+            delay += 100;
+        } else {
+            delay = 100;
         }
+        printf("delay btn %d \n", delay);
+        xQueueSend(xQueueButId, &delay, 0);
+        
     }
 }
 
@@ -84,20 +83,17 @@ void btn_2_task(void *p) {
 
     int delay = 0;
     while (true) {
-        if (!gpio_get(BTN_PIN_G)) {
+        vTaskDelay(pdMS_TO_TICKS(1));
+        
 
-            while (!gpio_get(BTN_PIN_G)) {
-                vTaskDelay(pdMS_TO_TICKS(1));
-            }
-
-            if (delay < 1000) {
-                delay += 100;
-            } else {
-                delay = 100;
-            }
-            printf("delay btn %d \n", delay);
-            xQueueSend(xQueueButId_g, &delay, 0);
+        if (delay < 1000) {
+            delay += 100;
+        } else {
+            delay = 100;
         }
+        printf("delay btn %d \n", delay);
+        xQueueSend(xQueueButId_g, &delay, 0);
+        
     }
 }
 
